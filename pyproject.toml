@@ -23,6 +23,8 @@ extract-frames = "extract_frames_robust.cli:app"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
+black = "^23.0"
+flake8 = "^5.0"
 
 [tool.black]
 line-length = 88

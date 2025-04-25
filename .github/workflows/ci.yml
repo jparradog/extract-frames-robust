@@ -25,6 +25,10 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-ansi
 
+      # Ensure black is installed properly before linting
+      - name: Verify black installation
+        run: poetry show black
+
       - name: Lint (black + flake8)
         run: |
           poetry run black --check .

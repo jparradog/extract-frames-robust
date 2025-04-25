@@ -8,6 +8,7 @@ import math
 from datetime import datetime
 from tqdm import tqdm
 
+
 def calcular_nitidez(frame: np.ndarray) -> float:
     """
     Calcula la varianza del Laplaciano (nitidez) de un frame.
@@ -36,7 +37,7 @@ def calcular_entropia(frame: np.ndarray) -> float:
     hist = np.bincount(gris.flatten(), minlength=256)
     prob = hist / hist.sum() if hist.sum() > 0 else hist
     prob = prob[prob > 0]
-    entropy = - (prob * np.log2(prob)).sum() if prob.size > 0 else 0.0
+    entropy = -(prob * np.log2(prob)).sum() if prob.size > 0 else 0.0
     return float(entropy)
 
 
@@ -51,7 +52,7 @@ def extraer_y_seleccionar(
     w_entropy: float = 1.0,
     sharp_percentile: float = 0.1,
     top_n: int = 1,
-    stage1_stride: float | None = None
+    stage1_stride: float | None = None,
 ):
     """
     Extracción jerárquica de fotogramas relevantes en dos etapas:
@@ -94,7 +95,7 @@ def extraer_y_seleccionar(
         start_f = int(start_t * fps)
         end_f = int(min(total_frames, (start_t + stage1_dur) * fps))
         heap = []
-        frames_window: list[tuple[float,int]] = []
+        frames_window: list[tuple[float, int]] = []
         sharp_list = []
         # recolectar nitidez en la ventana
         for f_idx in range(start_f, end_f, sample_step_current):
@@ -120,7 +121,7 @@ def extraer_y_seleccionar(
         # agregar candidatos de la ventana
         for sharp_val, f_idx in candidatos_ventana:
             time_sec = f_idx / fps
-            frames_info.append({'frame': f_idx, 'sharp': sharp_val, 'time': time_sec})
+            frames_info.append({"frame": f_idx, "sharp": sharp_val, "time": time_sec})
         # ajustar muestreo para siguiente ventana
         if sharp_list:
             best_sharp = max(sharp_list)
@@ -137,19 +138,21 @@ def extraer_y_seleccionar(
         return
 
     # Pre-cargar eritema y entropía para cada candidato
-    for f in tqdm(frames_info, desc="[2/3] Cálculo de eritema y entropía", unit="frame"):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, int(f['frame']))
+    for f in tqdm(
+        frames_info, desc="[2/3] Cálculo de eritema y entropía", unit="frame"
+    ):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(f["frame"]))
         ret, frame = cap.read()
-        f['red'] = calcular_ratio_rojo(frame) if ret else 0.0
-        f['entropy'] = calcular_entropia(frame) if ret else 0.0
+        f["red"] = calcular_ratio_rojo(frame) if ret else 0.0
+        f["entropy"] = calcular_entropia(frame) if ret else 0.0
 
     # Etapa 2: agrupar en segmentos largos y seleccionar por score
     resultados = []
-    total_groups = math.ceil((frames_info[-1]['time']) / stage2_dur)
+    total_groups = math.ceil((frames_info[-1]["time"]) / stage2_dur)
     for g in range(total_groups):
         start_t = g * stage2_dur
         end_t = start_t + stage2_dur
-        candidatos = [f for f in frames_info if start_t <= f['time'] < end_t]
+        candidatos = [f for f in frames_info if start_t <= f["time"] < end_t]
         if not candidatos:
             # Fallback: keyframe medio del segmento
             mid_t = start_t + stage2_dur / 2
@@ -160,13 +163,26 @@ def extraer_y_seleccionar(
                 sharp_mid = calcular_nitidez(frame_mid)
                 red_mid = calcular_ratio_rojo(frame_mid)
                 ent_mid = calcular_entropia(frame_mid)
-                candidatos = [{'frame': mid_idx, 'sharp': sharp_mid, 'red': red_mid, 'entropy': ent_mid, 'fallback': True, 'time': mid_t}]
+                candidatos = [
+                    {
+                        "frame": mid_idx,
+                        "sharp": sharp_mid,
+                        "red": red_mid,
+                        "entropy": ent_mid,
+                        "fallback": True,
+                        "time": mid_t,
+                    }
+                ]
             else:
                 continue
         best = None
         best_score = -1.0
         for f in candidatos:
-            score = w_sharp * f['sharp'] + w_red * f['red'] + w_entropy * f.get('entropy', 0.0)
+            score = (
+                w_sharp * f["sharp"]
+                + w_red * f["red"]
+                + w_entropy * f.get("entropy", 0.0)
+            )
             if score > best_score:
                 best_score = score
                 best = f
@@ -177,13 +193,15 @@ def extraer_y_seleccionar(
         return
 
     # Guardar frames seleccionados
-    for i, f in enumerate(tqdm(resultados, desc="[3/3] Guardando frames", unit="frame"), start=1):
-        idx = int(f['frame'])
+    for i, f in enumerate(
+        tqdm(resultados, desc="[3/3] Guardando frames", unit="frame"), start=1
+    ):
+        idx = int(f["frame"])
         cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
         ret, frame = cap.read()
         if not ret:
             continue
-        ts = int(f['time'])
+        ts = int(f["time"])
         name = f"frame_{idx:06d}_t{ts:04d}_sharp{int(f['sharp'])}_red{int(f['red']*100)}_entropy{int(f['entropy'])}.png"
         path = os.path.join(historial_dir, name)
         cv2.imwrite(path, frame)

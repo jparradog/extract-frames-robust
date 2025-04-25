@@ -1,0 +1,41 @@
+[project]
+name = "extract-frames-robust"
+version = "0.1.0"
+description = "Extracción robusta de fotogramas de broncoscopia"
+authors = [
+    {name = "John Parrado",email = "japarradog@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = "^3.12"
+dependencies = [
+    "numpy (>=2.2.5,<3.0.0)",
+    "scipy (>=1.15.2,<2.0.0)",
+    "rich (>=14.0.0,<15.0.0)",
+    "typer (>=0.15.2,<0.16.0)",
+    "tqdm (>=4.66.0,<5.0.0)",
+    "opencv-python (>=4.11.0.86,<5.0.0.0)",
+    "opencv-python-headless (>=4.11.0.86,<5.0.0.0)"
+]
+[tool.poetry.scripts]
+extract-frames = "extract_frames_robust.cli:app"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+exclude = '''
+/(
+  \.git
+ |\.venv
+ |build
+ |dist
+)/
+'''
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

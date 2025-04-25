@@ -1,8 +1,26 @@
 # Extract Frames Robust
 
-[![Build Status](https://github.com/tu_usuario/extract-frames-robust/actions/workflows/ci.yml/badge.svg)](https://github.com/tu_usuario/extract-frames-robust/actions) [![Tests](https://img.shields.io/github/actions/workflow/status/tu_usuario/extract-frames-robust/ci.yml?branch=main&label=Tests)](https://github.com/tu_usuario/extract-frames-robust/actions) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](LICENSE)
+[![CI](https://github.com/jparradog/extract-frames-robust/actions/workflows/ci.yml/badge.svg)](https://github.com/jparradog/extract-frames-robust/actions/workflows/ci.yml)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](LICENSE)
 
 Extract Frames Robust es una herramienta moderna para extraer automáticamente los fotogramas más clínicamente útiles de videos de broncoscopia, priorizando la nitidez y relevancia del contenido.
+
+## Tabla de Contenidos
+- [Extract Frames Robust](#extract-frames-robust)
+  - [Tabla de Contenidos](#tabla-de-contenidos)
+  - [Requisitos previos](#requisitos-previos)
+  - [Instalación](#instalación)
+  - [Uso rápido](#uso-rápido)
+  - [Parámetros principales](#parámetros-principales)
+  - [Ejemplo paso a paso](#ejemplo-paso-a-paso)
+    - [Ejemplo con parámetros avanzados](#ejemplo-con-parámetros-avanzados)
+  - [Validación cuantitativa](#validación-cuantitativa)
+  - [Contributing](#contributing)
+  - [Changelog](#changelog)
+  - [Seguridad](#seguridad)
+  - [License](#license)
+  - [Créditos](#créditos)
+  - [Ejecución](#ejecución)
 
 ## Requisitos previos
 
@@ -14,7 +32,7 @@ Extract Frames Robust es una herramienta moderna para extraer automáticamente l
 Clona este repositorio y ejecuta:
 
 ```bash
-git clone https://github.com/<tu_usuario>/extract-frames-robust.git
+git clone https://github.com/jparradog/extract-frames-robust.git
 cd extract-frames-robust
 poetry install
 ```
@@ -106,13 +124,21 @@ poetry run extract-frames validate video1.mp4 video2.mp4 \
 
 El comando imprime Precision y Recall agregados tras procesar todos los videos.
 
+## Contributing
+Lee [CONTRIBUTING.md](CONTRIBUTING.md) para detalles sobre cómo contribuir.
+
+## Changelog
+Consulta el historial de versiones en [CHANGELOG.md](CHANGELOG.md).
+
+## Seguridad
+Para reportar vulnerabilidades, revisa [SECURITY.md](SECURITY.md).
+
+## License
+Este proyecto está bajo la licencia [MPL 2.0](LICENSE).
+
 ## Créditos
 
 Autor: John Parrado (<japarradog@gmail.com>)
-
-## Licencia
-
-MIT
 
 ## Ejecución
 

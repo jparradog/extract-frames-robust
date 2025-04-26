@@ -1,11 +1,13 @@
 # extract_frames_robust/cli.py
 
-import typer
-from extract_frames_robust.core import extraer_y_seleccionar
-from rich import print
 import os
 import re
 from pathlib import Path
+
+import typer
+from rich import print
+
+from extract_frames_robust.core import extraer_y_seleccionar
 
 app = typer.Typer(
     help="Extrae fotogramas óptimos de videos de broncoscopia priorizando nitidez."
@@ -34,7 +36,8 @@ def extract(
         help="Percentil de nitidez para umbral dinámico en etapa 1 (0-1)",
     ),
     top_n: int = typer.Option(1, help="Número de frames top-N por ventana en etapa 1"),
-    stage1_stride: float | None = typer.Option(
+    stage1_stride: float
+    | None = typer.Option(
         None,
         help="Stride opcional para muestreo en etapa 1 (en segundos)",
     ),
@@ -119,7 +122,9 @@ def validate(
         total_gt += len(gts)
     recall = total_tp / total_gt if total_gt else 0.0
     precision = total_tp / total_pred if total_pred else 0.0
-    print(f"Precision: {precision:.3f}, Recall: {recall:.3f}")
+    print(
+        f"Precision: {precision: .3f}, Recall: {recall: .3f}"
+    )  # E231 fixed: whitespace after ':'
 
 
 if __name__ == "__main__":

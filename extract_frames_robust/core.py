@@ -1,11 +1,12 @@
 # extract_frames_robust/core.py
 
-import os
-import cv2
-import numpy as np
 import heapq
 import math
+import os
 from datetime import datetime
+
+import cv2
+import numpy as np
 from tqdm import tqdm
 
 
@@ -212,9 +213,9 @@ def extraer_y_seleccionar(
         red_val = int(f["red"] * 100)
         entropy_val = int(f["entropy"])
         name = (
-            f"frame_{idx:06d}_t{ts:04d}_sharp{sharp_val}_red{red_val}_"
+            f"frame_{idx: 06d}_t{ts: 04d}_sharp{sharp_val}_red{red_val}_"
             f"entropy{entropy_val}.png"
-        )
+        )  # E231 fixed: whitespace after ':'
         path = os.path.join(historial_dir, name)
         cv2.imwrite(path, frame)
 

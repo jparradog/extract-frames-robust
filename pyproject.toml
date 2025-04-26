@@ -25,6 +25,7 @@ extract-frames = "extract_frames_robust.cli:app"
 pytest = "^8.3.5"
 black = "^23.0"
 flake8 = "^5.0"
+pre-commit = "^4.2.0"
 
 [tool.black]
 line-length = 88

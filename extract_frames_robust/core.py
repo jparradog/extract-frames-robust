@@ -56,9 +56,12 @@ def extraer_y_seleccionar(
 ):
     """
     Extracción jerárquica de fotogramas relevantes en dos etapas:
-    1. Divide el video en segmentos cortos (stage1_dur), selecciona los top-N frames más nítidos de cada uno.
-    2. Agrupa los seleccionados en segmentos más largos (stage2_dur) y selecciona por score combinado.
-    Los fotogramas se almacenan en una subcarpeta con el nombre base del video y la fecha de generación.
+    1. Divide el video en segmentos cortos (stage1_dur), selecciona los top-N frames
+       más nítidos de cada uno.
+    2. Agrupa los seleccionados en segmentos más largos (stage2_dur) y selecciona
+       por score combinado.
+    Los fotogramas se almacenan en una subcarpeta con el nombre base del video y la
+    fecha de generación.
     """
     # Crear subcarpeta historial: <output_dir>/<nombre_video>_<YYYYmmdd_HHMMSS>
     base_video = os.path.splitext(os.path.basename(video_path))[0]
@@ -73,10 +76,12 @@ def extraer_y_seleccionar(
 
     # Validación de video
     if not os.path.isfile(video_path):
-        print(f"[ERROR] El archivo de video no existe: {video_path}")
+        print("[WARN] El archivo de video no existe: {}".format(video_path))
         return
     if total_frames == 0 or duration == 0:
-        print(f"[ERROR] El video no contiene frames o está corrupto: {video_path}")
+        print(
+            "[ERROR] El video no contiene frames o está corrupto: {}".format(video_path)
+        )
         return
 
     # Etapa 1: extracción con ventanas solapadas, top-N candidatos y muestreo adaptativo
@@ -134,7 +139,7 @@ def extraer_y_seleccionar(
                 sample_step_current *= 2
 
     if not frames_info:
-        print(f"[ERROR] No se pudieron extraer frames candidatos del video.")
+        print("[ERROR] No se pudieron extraer frames candidatos del video.")
         return
 
     # Pre-cargar eritema y entropía para cada candidato
@@ -156,10 +161,10 @@ def extraer_y_seleccionar(
         if not candidatos:
             # Fallback: keyframe medio del segmento
             mid_t = start_t + stage2_dur / 2
-            mid_idx = min(total_frames - 1, int(mid_t * fps))
+            mid_idx = int(mid_t * fps)
             cap.set(cv2.CAP_PROP_POS_FRAMES, mid_idx)
-            ret_mid, frame_mid = cap.read()
-            if ret_mid:
+            ret, frame_mid = cap.read()
+            if ret:
                 sharp_mid = calcular_nitidez(frame_mid)
                 red_mid = calcular_ratio_rojo(frame_mid)
                 ent_mid = calcular_entropia(frame_mid)
@@ -176,7 +181,7 @@ def extraer_y_seleccionar(
             else:
                 continue
         best = None
-        best_score = -1.0
+        best_score = -float("inf")
         for f in candidatos:
             score = (
                 w_sharp * f["sharp"]
@@ -186,10 +191,11 @@ def extraer_y_seleccionar(
             if score > best_score:
                 best_score = score
                 best = f
-        resultados.append(best)
+        if best:
+            resultados.append(best)
 
     if not resultados:
-        print(f"[ERROR] No se seleccionaron frames finales para guardar.")
+        print("[ERROR] No se seleccionaron frames finales para guardar.")
         return
 
     # Guardar frames seleccionados
@@ -202,9 +208,16 @@ def extraer_y_seleccionar(
         if not ret:
             continue
         ts = int(f["time"])
-        name = f"frame_{idx:06d}_t{ts:04d}_sharp{int(f['sharp'])}_red{int(f['red']*100)}_entropy{int(f['entropy'])}.png"
+        sharp_val = int(f["sharp"])
+        red_val = int(f["red"] * 100)
+        entropy_val = int(f["entropy"])
+        name = (
+            f"frame_{idx:06d}_t{ts:04d}_sharp{sharp_val}_red{red_val}_"
+            f"entropy{entropy_val}.png"
+        )
         path = os.path.join(historial_dir, name)
         cv2.imwrite(path, frame)
+
         print(f"Guardado: {os.path.relpath(path)}")
 
     cap.release()

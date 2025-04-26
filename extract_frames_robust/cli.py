@@ -20,7 +20,8 @@ def extract(
         1.0, help="Duración (s) de segmento de etapa 1 (nitidez)"
     ),
     stage2_dur: float = typer.Option(
-        5.0, help="Duración (s) de segmento de etapa 2 (score combinado)"
+        5.0,
+        help="Duración (s) de segmento de etapa 2 (score combinado)",
     ),
     sample_step: int = typer.Option(1, help="Muestreo cada N frames en etapa 1"),
     w_sharp: float = typer.Option(1.0, help="Peso de nitidez en el score de etapa 2"),
@@ -29,16 +30,18 @@ def extract(
         1.0, help="Peso de entropía en el score de la etapa 2"
     ),
     sharp_percentile: float = typer.Option(
-        0.1, help="Percentil de nitidez para umbral dinámico en etapa 1 (0-1)"
+        0.1,
+        help="Percentil de nitidez para umbral dinámico en etapa 1 (0-1)",
     ),
     top_n: int = typer.Option(1, help="Número de frames top-N por ventana en etapa 1"),
     stage1_stride: float | None = typer.Option(
         None,
-        help="Stride (s) entre ventanas de etapa 1 (por defecto igual a stage1-dur)",
+        help="Stride opcional para muestreo en etapa 1 (en segundos)",
     ),
 ):
     """
-    Extrae fotogramas útiles de un video usando metodología jerárquica (nitidez + eritema).
+    Extrae fotogramas útiles de un video usando metodología jerárquica
+    (nitidez + eritema).
     """
     extraer_y_seleccionar(
         video_path=video,
@@ -106,9 +109,9 @@ def validate(
             print(f"[WARN] GT faltante para {name}")
             continue
         gts = {
-            int(l.strip())
-            for l in gt_file.read_text().splitlines()
-            if l.strip().isdigit()
+            int(line.strip())
+            for line in gt_file.read_text().splitlines()
+            if line.strip() and line.strip().isdigit()
         }
         tp = len(preds & gts)
         total_tp += tp
